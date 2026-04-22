@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Workout Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --card: #202020;
+    --border: #2c2c2c;
+    --accent: #f5c842;
+    --text: #f0f0f0;
+    --muted: #888;
+    --quad: #4f9cf9;
+    --ham: #f97316;
+    --upper: #34d399;
+    --glute: #e879f9;
+    --yt: #ff0000;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh; padding-bottom: 60px; font-size: 15px;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 40px 20px 28px;
+    background: linear-gradient(160deg, #1c1c1c 0%, #0f0f0f 100%);
+    border-bottom: 1px solid var(--border); position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ''; position: absolute; top: -80px; right: -80px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(245,200,66,0.07) 0%, transparent 65%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .hero-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px,14vw,88px); line-height: 0.92; letter-spacing: 1px; }
+  .hero-title span { color: var(--accent); }
+  .hero-sub { margin-top: 14px; font-size: 13px; color: var(--muted); font-weight: 300; line-height: 1.6; }
+
+  /* SCHEDULE */
+  .schedule {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 3px; padding: 14px 12px;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+  }
+  .dc { text-align: center; padding: 8px 2px; border-radius: 8px; }
+  .dc .n { color: var(--muted); text-transform: uppercase; font-size: 8px; letter-spacing: 0.5px; }
+  .dc .l { margin-top: 4px; font-size: 9px; font-weight: 600; line-height: 1.2; }
+  .dc.active { background: var(--card); }
+  .dc.rest { opacity: 0.38; }
+  .dc.quad .l { color: var(--quad); }
+  .dc.ham .l  { color: var(--ham);  }
+  .dc.upper .l{ color: var(--upper);}
+  .dc.glute .l{ color: var(--glute);}
+
+  /* DAY SECTION */
+  .day { padding: 28px 16px 12px; }
+  .day-head {
+    display: flex; gap: 14px; align-items: flex-start;
+    margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+  }
+  .day-icon { width: 50px; height: 50px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .day-badge { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; margin-bottom: 3px; }
+  .day-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1px; line-height: 1; }
+  .day-info  { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .quad .day-icon  { background: rgba(79,156,249,.10); }
+  .quad .day-badge, .quad .day-title  { color: var(--quad); }
+  .ham  .day-icon  { background: rgba(249,115,22,.10); }
+  .ham  .day-badge, .ham  .day-title  { color: var(--ham);  }
+  .upper .day-icon { background: rgba(52,211,153,.10); }
+  .upper .day-badge,.upper .day-title { color: var(--upper);}
+  .glute .day-icon { background: rgba(232,121,249,.10); }
+  .glute .day-badge,.glute .day-title { color: var(--glute);}
+
+  /* EXERCISE CARD */
+  .exlist { display: flex; flex-direction: column; gap: 10px; }
+  .ex { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+
+  /* YouTube thumbnail row */
+  .yt-link {
+    display: block; position: relative; text-decoration: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .yt-thumb {
+    width: 100%; height: 180px; object-fit: cover; display: block;
+    background: #111;
+  }
+  .yt-play {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 52px; height: 36px; background: var(--yt); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .yt-play::after {
+    content: ''; border-left: 16px solid white; border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent; margin-left: 3px;
+  }
+  .yt-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.75));
+    color: #fff; font-size: 11px; padding: 20px 10px 8px;
+    font-weight: 500; letter-spacing: 0.2px;
+  }
+
+  /* When there are two YT links (superset) */
+  .yt-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; border-bottom: 1px solid var(--border); }
+  .yt-pair .yt-link { border-bottom: none; }
+  .yt-pair .yt-thumb { height: 110px; }
+  .yt-pair .yt-play { width: 36px; height: 26px; border-radius: 5px; }
+  .yt-pair .yt-play::after { border-left-width: 11px; border-top-width: 6px; border-bottom-width: 6px; }
+
+  /* Card body */
+  .ex-body { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 14px; align-items: start; }
+  .ex-num  { font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: 1px; margin-bottom: 3px; }
+  .ex-name { font-size: 16px; font-weight: 600; margin-bottom: 3px; }
+  .ex-muscles { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .ex-tip { font-size: 12px; color: #aaa; font-style: italic; line-height: 1.45; padding-top: 8px; border-top: 1px solid var(--border); }
+  .ex-tip::before { content: '💡 '; font-style: normal; }
+  .ex-note { font-size: 11px; color: var(--accent); margin-top: 5px; font-style: normal; }
+  .ex-right  { text-align: right; }
+  .ex-sets   { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px; line-height: 1; }
+  .ex-label  { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* Divider */
+  .divider { height: 6px; background: var(--surface); margin: 4px 0; }
+
+  /* Tips */
+  .tips { margin: 12px 16px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+  .tips-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--accent); margin-bottom: 14px; }
+  .tip { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; line-height: 1.55; color: #ccc; }
+  .tip:last-child { border-bottom: none; }
+  .tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">4-Day Program · Beginner</div>
+  <div class="hero-title">YOUR<br><span>WORKOUT</span><br>PLAN</div>
+  <div class="hero-sub">Legs-focused · Gym-based · Go light &amp; have fun 💪</div>
+</div>
+
+<!-- SCHEDULE -->
+<div class="schedule">
+  <div class="dc active quad"><div class="n">Mon</div><div class="l">Quads</div></div>
+  <div class="dc active ham"> <div class="n">Tue</div><div class="l">Hams</div></div>
+  <div class="dc rest">       <div class="n">Wed</div><div class="l">Rest</div></div>
+  <div class="dc active upper"><div class="n">Thu</div><div class="l">Upper</div></div>
+  <div class="dc rest">       <div class="n">Fri</div><div class="l">Rest</div></div>
+  <div class="dc active glute"><div class="n">Sat</div><div class="l">Glutes</div></div>
+  <div class="dc rest">       <div class="n">Sun</div><div class="l">Rest</div></div>
+</div>
+
+<!-- ══════════════ DAY 1: QUADS ══════════════ -->
+<div class="day quad">
+  <div class="day-head">
+    <div class="day-icon">🦵</div>
+    <div>
+      <div class="day-badge">Monday · Day 1</div>
+      <div class="day-title">Quad Focus</div>
+      <div class="day-info">6 exercises · Rest as long as you need (~3–4 min)</div>
+    </div>
+  </div>
+  <div class="exlist">
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=zmBGE4GcMTY" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/zmBGE4GcMTY/hqdefault.jpg" alt="Leg Press tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: 45° Leg Press form tutorial</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">01</div>
+          <div class="ex-name">Leg Press (45°)</div>
+          <div class="ex-muscles">Quads · Glutes · Hamstrings</div>
+          <div class="ex-tip">Feet shoulder-width on the platform. Push diagonally upward. Don't lock out at the top.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×15</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=SALxEARiMkw" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/SALxEARiMkw/hqdefault.jpg" alt="Lat Pulldown tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Lat Pulldown — avoid mistakes</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">02</div>
+          <div class="ex-name">Lat Pulldown</div>
+          <div class="ex-muscles">Lats · Biceps · Rear Delts</div>
+          <div class="ex-tip">Pull to your chest. Think elbows going down toward your hips, not arms pulling.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×12</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=o90ocSBDJis" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/o90ocSBDJis/hqdefault.jpg" alt="Leg Extension tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Leg Extension — proper form</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">03</div>
+          <div class="ex-name">Leg Extension</div>
+          <div class="ex-muscles">Quads (isolation)</div>
+          <div class="ex-tip">Align the pivot with your knee. Lower slowly — don't let the weight drop.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×12</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=BAZkFGeUy5U" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/BAZkFGeUy5U/hqdefault.jpg" alt="Shoulder Press Machine tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Shoulder Press Machine tutorial</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">04</div>
+          <div class="ex-name">Shoulder Press (Machine)</div>
+          <div class="ex-muscles">Shoulders · Triceps</div>
+          <div class="ex-tip">Keep your back against the pad. No need to fully lock out at the top.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×10</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=dhRz1Ns60Zg" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/dhRz1Ns60Zg/hqdefault.jpg" alt="Calf Raises on Leg Press" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Calf Raises on the Leg Press</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">05</div>
+          <div class="ex-name">Calf Raises</div>
+          <div class="ex-muscles">Calves</div>
+          <div class="ex-tip">Full range — stretch all the way down, rise all the way up. Slow tempo.</div>
+          <div class="ex-note">💡 Do these on the leg press machine (horizontal push with just your toes)</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">4×20</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=Jfp4b5Olc7A" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/Jfp4b5Olc7A/hqdefault.jpg" alt="Bicep Curl tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Dumbbell Curl — proper form</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">06</div>
+          <div class="ex-name">Bicep Curl</div>
+          <div class="ex-muscles">Biceps · Forearms</div>
+          <div class="ex-tip">Keep elbows pinned at your sides. No swinging. Feel the contraction at the top.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×12</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════ DAY 2: HAMSTRINGS ══════════════ -->
+<div class="day ham">
+  <div class="day-head">
+    <div class="day-icon">🔥</div>
+    <div>
+      <div class="day-badge">Tuesday · Day 2</div>
+      <div class="day-title">Hamstring Focus</div>
+      <div class="day-info">6 exercises · Rest as long as you need (~3–4 min)</div>
+    </div>
+  </div>
+  <div class="exlist">
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=yTnWiBECvLk" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/yTnWiBECvLk/hqdefault.jpg" alt="Hip Thrust tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Hip Thrust for beginners</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">01</div>
+          <div class="ex-name">Hip Thrust</div>
+          <div class="ex-muscles">Glutes · Hamstrings · Core</div>
+          <div class="ex-tip">Drive through your heels. Squeeze hard at the top and hold 1 second. Chin tucked.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×15</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=vwHG9Jfu4sw" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/vwHG9Jfu4sw/hqdefault.jpg" alt="Cable Row tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Seated Cable Row tutorial</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">02</div>
+          <div class="ex-name">Cable Row</div>
+          <div class="ex-muscles">Lats · Rhomboids · Biceps</div>
+          <div class="ex-tip">Pull your elbows back, not just your hands. Squeeze shoulder blades together at the end.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×12</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=SbSNUXPRkc8" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/SbSNUXPRkc8/hqdefault.jpg" alt="Lying Leg Curl tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Lying Leg Curl — proper form</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">03</div>
+          <div class="ex-name">Lying Leg Curl</div>
+          <div class="ex-muscles">Hamstrings (isolation)</div>
+          <div class="ex-tip">Keep hips pressed into the pad. Don't arch your lower back as you curl up.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×12</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=OjI5OpV6IWA" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/OjI5OpV6IWA/hqdefault.jpg" alt="Abductor Machine tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Abductor Machine — proper form</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">04</div>
+          <div class="ex-name">Abductor Machine</div>
+          <div class="ex-muscles">Outer thighs · Glute Med</div>
+          <div class="ex-tip">Push legs outward against the pads. Controlled on the way back in — don't let them snap.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×15</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=MLBm7i341Rw" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/MLBm7i341Rw/hqdefault.jpg" alt="Adductor Machine tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Adductor Machine — proper form</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">05</div>
+          <div class="ex-name">Adductor Machine</div>
+          <div class="ex-muscles">Inner thighs · Groin</div>
+          <div class="ex-tip">Squeeze legs together against the pads. Slow on the way back out.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×15</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=_w-HpW70nSQ" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/_w-HpW70nSQ/hqdefault.jpg" alt="Tricep Pushdown tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Cable Triceps Pushdown — 3 golden rules</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">06</div>
+          <div class="ex-name">Tricep Pushdown</div>
+          <div class="ex-muscles">Triceps (isolation)</div>
+          <div class="ex-tip">Elbows stay at your sides throughout. Full extension at the bottom of each rep.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×12</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════ DAY 3: UPPER BODY ══════════════ -->
+<div class="day upper">
+  <div class="day-head">
+    <div class="day-icon">💪</div>
+    <div>
+      <div class="day-badge">Thursday · Day 3</div>
+      <div class="day-title">Upper Body</div>
+      <div class="day-info">5 exercises · Rest as long as you need (~3–4 min)</div>
+    </div>
+  </div>
+  <div class="exlist">
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=pKZMNVbfUzQ" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/pKZMNVbfUzQ/hqdefault.jpg" alt="Dumbbell Bench Press tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Dumbbell Bench Press — proper form</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">01</div>
+          <div class="ex-name">Dumbbell Bench Press</div>
+          <div class="ex-muscles">Chest · Shoulders · Triceps</div>
+          <div class="ex-tip">Lower dumbbells slowly to chest level. Don't bounce. Start very light.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×10</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=SALxEARiMkw" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/SALxEARiMkw/hqdefault.jpg" alt="Lat Pulldown tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Lat Pulldown — avoid mistakes</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">02</div>
+          <div class="ex-name">Lat Pulldown</div>
+          <div class="ex-muscles">Lats · Biceps · Rear Delts</div>
+          <div class="ex-tip">Wide grip. Pull to collarbone. Full stretch at the top between each rep.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×12</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=k6LyPhGRV-o" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/k6LyPhGRV-o/hqdefault.jpg" alt="Back Extension tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Back Extension (Hyperextension) — correct form</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">03</div>
+          <div class="ex-name">Back Extension</div>
+          <div class="ex-muscles">Lower back · Glutes · Hamstrings</div>
+          <div class="ex-tip">Don't hyperextend at the top. Squeeze glutes as you rise. Neutral spine throughout.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×15</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=0Po47vvj9g4" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/0Po47vvj9g4/hqdefault.jpg" alt="Face Pull tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Cable Face Pulls — how to do them</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">04</div>
+          <div class="ex-name">Face Pull (Cable)</div>
+          <div class="ex-muscles">Rear Delts · Rotator Cuff · Traps</div>
+          <div class="ex-tip">Pull toward your face, elbows high. Super important for shoulder health — don't skip!</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×15</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="yt-pair">
+        <a class="yt-link" href="https://www.youtube.com/watch?v=Jfp4b5Olc7A" target="_blank">
+          <img class="yt-thumb" src="https://img.youtube.com/vi/Jfp4b5Olc7A/hqdefault.jpg" alt="Bicep Curl" loading="lazy">
+          <div class="yt-play"></div>
+          <div class="yt-label">Bicep Curl</div>
+        </a>
+        <a class="yt-link" href="https://www.youtube.com/watch?v=_w-HpW70nSQ" target="_blank">
+          <img class="yt-thumb" src="https://img.youtube.com/vi/_w-HpW70nSQ/hqdefault.jpg" alt="Tricep Pushdown" loading="lazy">
+          <div class="yt-play"></div>
+          <div class="yt-label">Tricep Pushdown</div>
+        </a>
+      </div>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">05</div>
+          <div class="ex-name">Bicep Curl + Tricep Pushdown</div>
+          <div class="ex-muscles">Biceps · Triceps</div>
+          <div class="ex-tip">Do them back-to-back (superset) with no rest between. Then take your full rest after both.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">2×12</div><div class="ex-label">each</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════ DAY 4: GLUTES ══════════════ -->
+<div class="day glute">
+  <div class="day-head">
+    <div class="day-icon">🍑</div>
+    <div>
+      <div class="day-badge">Saturday · Day 4</div>
+      <div class="day-title">Glute Focus</div>
+      <div class="day-info">7 exercises · Rest as long as you need (~3–4 min)</div>
+    </div>
+  </div>
+  <div class="exlist">
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=yTnWiBECvLk" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/yTnWiBECvLk/hqdefault.jpg" alt="Hip Thrust tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Hip Thrust for beginners</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">01</div>
+          <div class="ex-name">Hip Thrust</div>
+          <div class="ex-muscles">Glutes · Hamstrings · Core</div>
+          <div class="ex-tip">The main event of the week. Full squeeze and hold at the top. Try to go slightly heavier than Tuesday.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×12</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=M81mVLxbXms" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/M81mVLxbXms/hqdefault.jpg" alt="Incline Dumbbell Row tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Incline Dumbbell Row (both arms)</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">02</div>
+          <div class="ex-name">Incline Dumbbell Row</div>
+          <div class="ex-muscles">Lats · Rhomboids · Biceps</div>
+          <div class="ex-tip">Lie chest-down on a slightly inclined bench. Both arms row at the same time, elbows drive back toward your hips.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×12</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=9KzZD_n2r64" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/9KzZD_n2r64/hqdefault.jpg" alt="Goblet Squat tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Goblet Squat — complete beginner guide</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">03</div>
+          <div class="ex-name">Goblet Squat</div>
+          <div class="ex-muscles">Quads · Glutes · Core</div>
+          <div class="ex-tip">Hold a dumbbell at your chest. Chest up, elbows inside your knees. Great for learning squat form.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×12</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=OjI5OpV6IWA" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/OjI5OpV6IWA/hqdefault.jpg" alt="Abductor Machine tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Abductor Machine — proper form</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">04</div>
+          <div class="ex-name">Abductor Machine</div>
+          <div class="ex-muscles">Outer thighs · Glute Med</div>
+          <div class="ex-tip">Push legs outward. Slow and controlled on the way back in.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×15</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=MLBm7i341Rw" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/MLBm7i341Rw/hqdefault.jpg" alt="Adductor Machine tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Adductor Machine — proper form</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">05</div>
+          <div class="ex-name">Adductor Machine</div>
+          <div class="ex-muscles">Inner thighs · Groin</div>
+          <div class="ex-tip">Squeeze legs together. Don't go too heavy — focus on feeling the inner thigh contract.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×15</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=dhRz1Ns60Zg" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/dhRz1Ns60Zg/hqdefault.jpg" alt="Calf Raises on Leg Press" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Calf Raises on the Leg Press</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">06</div>
+          <div class="ex-name">Calf Raises</div>
+          <div class="ex-muscles">Calves</div>
+          <div class="ex-tip">Pause at the top, full stretch at the bottom. Slow and controlled every rep.</div>
+          <div class="ex-note">💡 Do these on the leg press machine (horizontal push with just your toes)</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">4×20</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <a class="yt-link" href="https://www.youtube.com/watch?v=8XLxfXROrTo" target="_blank">
+        <img class="yt-thumb" src="https://img.youtube.com/vi/8XLxfXROrTo/hqdefault.jpg" alt="Hammer Curl tutorial" loading="lazy">
+        <div class="yt-play"></div>
+        <div class="yt-label">Watch: Hammer Curl — perfect form</div>
+      </a>
+      <div class="ex-body">
+        <div>
+          <div class="ex-num">07</div>
+          <div class="ex-name">Hammer Curl</div>
+          <div class="ex-muscles">Biceps · Brachialis · Forearms</div>
+          <div class="ex-tip">Palms face each other throughout the whole movement. Nice and controlled.</div>
+        </div>
+        <div class="ex-right"><div class="ex-sets">3×12</div><div class="ex-label">Sets×Reps</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TIPS -->
+<div class="tips">
+  <div class="tips-title">📌 Important Tips</div>
+  <div class="tip"><span class="tip-icon">⏱️</span>Rest as long as you need between sets — around 3–4 minutes is the sweet spot. Never rush. Always feel fresh before the next set.</div>
+  <div class="tip"><span class="tip-icon">🪶</span>Always start light. You should never reach failure — leave 3–4 reps in the tank each set, especially in the first weeks.</div>
+  <div class="tip"><span class="tip-icon">📈</span>Progressive overload: try to add a little weight or 1–2 reps every week once you feel comfortable and ready.</div>
+  <div class="tip"><span class="tip-icon">🎯</span>First 2–3 weeks are all about learning the movements. Watch the videos, go slow, feel the target muscle working.</div>
+  <div class="tip"><span class="tip-icon">🥩</span>Protein: aim for ~1.6g per kg of bodyweight daily. It makes a real difference for recovery and progress.</div>
+  <div class="tip"><span class="tip-icon">💤</span>Sleep is when you grow. 7–9h makes a bigger difference than most supplements.</div>
+  <div class="tip"><span class="tip-icon">😊</span>Most importantly — enjoy it! The best workout is the one you actually look forward to.</div>
+</div>
+
+</body>
+</html>
