@@ -20,6 +20,24 @@
     --glute: #e879f9;
     --yt: #ff0000;
   }
+  /* Show tutorial button */
+.show-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: #000;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Hidden video container */
+.yt-hidden {
+  display: none;
+}
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
     background: var(--bg); color: var(--text);
@@ -172,11 +190,17 @@
   <div class="exlist">
 
     <div class="ex">
-      <a class="yt-link" href="https://www.youtube.com/watch?v=ETOAyWM6i6A" target="_blank">
-        <img class="yt-thumb" src="https://img.youtube.com/vi/ETOAyWM6i6A/hqdefault.jpg" alt="Leg Press tutorial" loading="lazy">
-        <div class="yt-play"></div>
-        <div class="yt-label">Watch: Leg Press form tutorial</div>
-      </a>
+
+      <button class="show-btn">Show tutorial</button>
+
+<div class="yt-hidden">
+  <a class="yt-link" href="https://www.youtube.com/watch?v=ETOAyWM6i6A" target="_blank">
+    <img class="yt-thumb" src="https://img.youtube.com/vi/ETOAyWM6i6A/hqdefault.jpg">
+    <div class="yt-play"></div>
+    <div class="yt-label">Watch: Leg Press form tutorial</div>
+  </a>
+</div>
+      
       <div class="ex-body">
         <div>
           <div class="ex-num">01</div>
@@ -636,5 +660,24 @@
   <div class="tip"><span class="tip-icon">😊</span>Most importantly — enjoy it! The best workout is the one you actually look forward to.</div>
 </div>
 
+  <!-- 👇 PUT SCRIPT HERE -->
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".show-btn").forEach(btn => {
+      btn.addEventListener("click", function () {
+        const container = this.nextElementSibling;
+
+        if (container.style.display === "block") {
+          container.style.display = "none";
+          this.textContent = "Show tutorial";
+        } else {
+          container.style.display = "block";
+          this.textContent = "Hide tutorial";
+        }
+      });
+    });
+  });
+  </script>
+  
 </body>
 </html>
